@@ -1,0 +1,23 @@
+#!/bin/bash
+#SBATCH --job-name=serial
+#SBATCH --nodes=1 #number of nodes requested
+#SBATCH --ntasks-per-node=1
+#SBATCH --cluster=smp # mpi, gpu and smp are available in H2P
+#SBATCH --partition=smp # available: smp, high-mem, opa, gtx1080, titanx, k40
+#SBATCH --mail-user=plh25@pitt.edu #send email to this address if ...
+#SBATCH --mail-type=END,FAIL # ... job ends or fails
+#SBATCH --time=10:00 # walltime in dd-hh:mm format
+#SBATCH --qos=normal # enter long if walltime is greater than 3 days
+#SBATCH --output=serial.out # the file that contains output
+module purge #make sure the modules environment is sane
+module load intel/2017.1.132 intel-mpi/2017.1.132 fhiaims/160328_3
+cp P2_serial.cpp $SLURM_SCRATCH # Copy inputs to scratch
+cd $SLURM_SCRATCH #change directory
+# Set a trap to copy any temp files you may need
+run_on_exit(){
+ cp -r $SLURM_SCRATCH/* $SLURM_SUBMIT_DIR
+}
+trap run_on_exit EXIT
+g++ P2_serial.cpp -std=c99 -o main.o #compile the program, set the runnable filename
+./main.o # Run the runnable
+crc-job-stats.py # gives stats of job, wall time, etc.

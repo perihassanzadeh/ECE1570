@@ -1,1 +1,1 @@
-# ECE1570
+# ECE1570 - High Performance Computing 
